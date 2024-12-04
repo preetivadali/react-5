@@ -1,10 +1,29 @@
-import {useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import Axios from 'axios';
 import "./App.css";
 
 function App() {
+  const [name, setName] = useState(""); 
+  const [age, setAge] = useState(null);   
+  const [error, setError] = useState("");
+
+  const fetchAgeData = () => {
+    if (!name) {
+      setError("Please enter a name.");
+      return;
+    }
+    setError("");
+
+    const API_URL = `https://api.agify.io/?name=${name}`;
+    Axios.get(API_URL)
+      .then((res) => {
+        setAge(res.data.age); 
+      })
+      
+  };
+
   return (
     <div className="container">
-      
       <header className="header">
         <div className="logo">Seker</div>
         <nav className="nav">
@@ -19,24 +38,28 @@ function App() {
         </nav>
       </header>
 
-    
       <main className="search-section">
         <div className="search-bar">
           <input
             type="text"
-            placeholder="How to design"
+            placeholder="Enter your name"
             className="search-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)} 
           />
-          <button className="search-button">Search</button>
+          <button className="search-button" onClick={fetchAgeData}>
+            Search
+          </button>
         </div>
 
-        
-        <ul className="suggestions">
-          <li>How to design</li>
-          <li>How to work hard</li>
-          <li>How to choose font</li>
-          <li>How to choose color palette</li>
-        </ul>
+       
+
+       
+        {age !== null && !error && (
+          <div className="age-result">
+            <h2>Estimated average age for {name}: {age} years</h2>
+          </div>
+        )}
       </main>
     </div>
   );
