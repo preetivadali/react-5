@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState,useEffect } from "react";
 import Axios from 'axios';
 import "./App.css";
 
 function App() {
   const [name, setName] = useState(""); 
-  const [age, setAge] = useState(null);   
-  const [error, setError] = useState("");
+  const [searchName, setSearchName] = useState(""); 
+  const [age, setAge] = useState(null); 
+  const [error, setError] = useState(""); // Track errors
 
   const fetchAgeData = () => {
     if (!name) {
@@ -17,9 +18,13 @@ function App() {
     const API_URL = `https://api.agify.io/?name=${name}`;
     Axios.get(API_URL)
       .then((res) => {
-        setAge(res.data.age); 
+        setSearchName(name);
+        setAge(res.data.age);
       })
-      
+      .catch((err) => {
+        console.error("Error fetching age data:", err);
+        setError("Something went wrong. Please try again later.");
+      });
   };
 
   return (
@@ -40,24 +45,29 @@ function App() {
 
       <main className="search-section">
         <div className="search-bar">
+          <label htmlFor="name-input" className="search-label">
+            Enter a name:
+          </label>
           <input
+            id="name-input"
             type="text"
             placeholder="Enter your name"
             className="search-input"
             value={name}
-            onChange={(e) => setName(e.target.value)} 
+            onChange={(e) => setName(e.target.value)}
           />
           <button className="search-button" onClick={fetchAgeData}>
             Search
           </button>
         </div>
 
-       
+        {error && <div className="error-message">{error}</div>}
 
-       
         {age !== null && !error && (
           <div className="age-result">
-            <h2>Estimated average age for {name}: {age} years</h2>
+            <h2>
+              Estimated average age for {searchName}: {age} years
+            </h2>
           </div>
         )}
       </main>
